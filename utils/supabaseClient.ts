@@ -4,7 +4,9 @@ import { ActiveSessionResource } from "@clerk/types";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
-export function createClerkSupabaseClient(session: ActiveSessionResource | null | undefined) {
+export function createClerkSupabaseClient(
+    session: ActiveSessionResource | null | undefined,
+) {
     return createClient(supabaseUrl, supabaseAnonKey, {
         global: {
             // Get the custom Supabase token from Clerk
