@@ -1,11 +1,12 @@
 import { Stack } from "expo-router";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { StatusBar } from "expo-status-bar";
+import { setStatusBarStyle } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
 import { ClerkProvider } from "@clerk/clerk-expo";
 import { LogBox } from "react-native";
 import { SupabaseProvider } from "@/context/SupabaseContext";
+import { useEffect } from "react";
 
 LogBox.ignoreLogs(["Clerk:"]);
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
@@ -46,11 +47,14 @@ function InitialLayout() {
 }
 
 export default function RootLayoutNav() {
+    useEffect(() => {
+        setStatusBarStyle("light");
+    }, []);
     return (
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
             <ActionSheetProvider>
                 <GestureHandlerRootView style={{ flex: 1 }}>
-                    <StatusBar style={"light"} />
+                    {/*<StatusBar style={"light"} />*/}
                     <InitialLayout />
                 </GestureHandlerRootView>
             </ActionSheetProvider>
