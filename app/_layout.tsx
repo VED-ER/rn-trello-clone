@@ -4,11 +4,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { setStatusBarStyle } from "expo-status-bar";
 import * as SecureStore from "expo-secure-store";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
-import { ActivityIndicator, LogBox, View } from "react-native";
+import { LogBox } from "react-native";
 import { SupabaseProvider } from "@/context/SupabaseContext";
 import { useEffect } from "react";
-import { is } from "@babel/types";
-import colors from "tailwindcss/colors";
+import * as SplashScreen from "expo-splash-screen";
 
 LogBox.ignoreLogs(["Clerk:"]);
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
@@ -38,6 +37,8 @@ const tokenCache = {
     },
 };
 
+SplashScreen.preventAutoHideAsync();
+
 function InitialLayout() {
     const router = useRouter();
     const { isLoaded, isSignedIn } = useAuth();
@@ -56,11 +57,9 @@ function InitialLayout() {
     }, [isSignedIn]);
 
     if (!isLoaded) {
-        return (
-            <View className={"flex-1 items-center justify-center"}>
-                <ActivityIndicator size={"large"} color={colors.blue["600"]} />
-            </View>
-        );
+        return null;
+    } else {
+        SplashScreen.hideAsync();
     }
     return (
         <SupabaseProvider>
