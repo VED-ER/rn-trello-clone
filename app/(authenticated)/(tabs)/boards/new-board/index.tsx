@@ -1,4 +1,4 @@
-import { Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Link, router, Stack, useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import { setStatusBarStyle } from "expo-status-bar";
 
 export default function NewBoard() {
     const [boardName, setBoardName] = useState("");
+    const [creatingBoard, setCreatingBoard] = useState(false);
     const { createBoard } = useSupabase();
     // TODO: find a new way to send color from color-select screen without using global search params
     const { bg } = useGlobalSearchParams<{ bg?: string }>();
@@ -33,9 +34,15 @@ export default function NewBoard() {
     }, []);
 
     const onCreateBoard = async () => {
-        // TODO: improve error handling (show an alert maybe), disable create button when pressed for the first time
-        await createBoard!(boardName, selectedColor);
-        router.dismiss();
+        setCreatingBoard(true);
+        try {
+            await createBoard!(boardName, selectedColor);
+            router.dismiss();
+        } catch (e: any) {
+            Alert.alert("Error creating board", e.message);
+        } finally {
+            setCreatingBoard(false);
+        }
     };
 
     return (
@@ -43,7 +50,10 @@ export default function NewBoard() {
             <Stack.Screen
                 options={{
                     headerRight: () => (
-                        <TouchableOpacity onPress={onCreateBoard} disabled={boardName === ""}>
+                        <TouchableOpacity
+                            onPress={onCreateBoard}
+                            disabled={boardName === "" || creatingBoard}
+                        >
                             <Text
                                 className={`text-lg font-medium ${boardName !== "" ? "text-primary" : "text-grey"}`}
                             >
