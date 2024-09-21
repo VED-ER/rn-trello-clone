@@ -6,6 +6,7 @@ import { useRouter } from "expo-router";
 
 export default function DropdownPlus() {
     const router = useRouter();
+    // TODO: make custom ItemIcon and use custom icons (for both android and iOS)
     return (
         <DropdownMenu.Root>
             <DropdownMenu.Trigger>
