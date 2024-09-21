@@ -13,23 +13,13 @@ export default function ColorSelect() {
     };
 
     return (
-        <View
-            style={{
-                flexDirection: "row",
-                flexGrow: 1,
-                flexWrap: "wrap",
-                justifyContent: "center",
-            }}
-        >
+        <View className={"flex-row flex-grow flex-wrap justify-center max-w-[330px] mx-auto"}>
             {BOARD_COLORS.map((color) => (
                 <TouchableOpacity
                     key={color}
+                    className={"h-[100px] w-[100px] m-[5px] rounded"}
                     style={{
                         backgroundColor: color,
-                        height: 100,
-                        width: 100,
-                        margin: 5,
-                        borderRadius: 4,
                         borderWidth: selected === color ? 2 : 0,
                         borderColor: colors.fontDark,
                     }}
