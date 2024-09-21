@@ -3,7 +3,7 @@ import { colors } from "@/constants/tailwind-colors";
 import { Image } from "expo-image";
 import { images } from "@/constants";
 import DropdownPlus from "@/components/DropdownPlus";
-import { TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function BoardsLayout() {
@@ -36,14 +36,16 @@ export default function BoardsLayout() {
                 options={{
                     title: "Start with a template",
                     presentation: "fullScreenModal",
-                    headerRight: () => (
-                        <TouchableOpacity
-                            onPress={() => router.back()}
-                            className={"bg-lightGray rounded-2xl p-2"}
-                        >
-                            <Ionicons name="close" size={18} color={colors.darkGray} />
-                        </TouchableOpacity>
-                    ),
+                    headerRight: () => {
+                        return Platform.OS === "ios" ? (
+                            <TouchableOpacity
+                                onPress={() => router.back()}
+                                className={"bg-lightGray rounded-2xl p-2"}
+                            >
+                                <Ionicons name="close" size={18} color={colors.darkGray} />
+                            </TouchableOpacity>
+                        ) : null;
+                    },
                 }}
             />
         </Stack>

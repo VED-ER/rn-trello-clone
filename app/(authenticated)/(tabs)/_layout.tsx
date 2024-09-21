@@ -3,6 +3,7 @@ import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icon
 import { Image } from "expo-image";
 import { images } from "@/constants";
 import { colors } from "@/constants/tailwind-colors";
+import { Platform } from "react-native";
 
 export default function TabsLayout() {
     return (
@@ -19,8 +20,9 @@ export default function TabsLayout() {
                 },
                 tabBarLabelStyle: { fontSize: 12 },
                 tabBarStyle: {
-                    height: 90,
-                    paddingTop: 10,
+                    height: Platform.OS === "ios" ? 90 : 70,
+                    paddingTop: Platform.OS === "ios" ? 5 : 10,
+                    paddingBottom: Platform.OS === "ios" ? 30 : 10,
                 },
             }}
         >

@@ -1,10 +1,11 @@
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Link, router, Stack, useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { useSupabase } from "@/context/SupabaseContext";
 import { DEFAULT_BOARD_COLOR } from "@/constants";
 import { colors } from "@/constants/tailwind-colors";
+import { setStatusBarStyle } from "expo-status-bar";
 
 export default function NewBoard() {
     const [boardName, setBoardName] = useState("");
@@ -18,6 +19,18 @@ export default function NewBoard() {
             setSelectedColor(bg);
         }
     }, [bg]);
+
+    useEffect(() => {
+        if (Platform.OS === "android") {
+            setStatusBarStyle("dark");
+        }
+
+        return () => {
+            if (Platform.OS === "android") {
+                setStatusBarStyle("light");
+            }
+        };
+    }, []);
 
     const onCreateBoard = async () => {
         // TODO: improve error handling (show an alert maybe), disable create button when pressed for the first time

@@ -1,6 +1,6 @@
 import { router, Stack } from "expo-router";
 import { DefaultTheme } from "@react-navigation/native";
-import { TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/tailwind-colors";
 
@@ -16,7 +16,10 @@ export default function NewBoardLayout() {
                         backgroundColor: DefaultTheme.colors.background,
                     },
                     headerLeft: () => (
-                        <TouchableOpacity onPress={() => router.back()}>
+                        <TouchableOpacity
+                            style={{ marginRight: Platform.OS === "android" ? 10 : 0 }}
+                            onPress={() => router.back()}
+                        >
                             <Ionicons name="close" size={26} color={colors.primary} />
                         </TouchableOpacity>
                     ),
