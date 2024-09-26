@@ -8,7 +8,7 @@ export default function Boards() {
     const [boards, setBoards] = useState<Board[]>([]);
     const [refreshing, setRefreshing] = useState(false);
     const { getBoards } = useSupabase();
-    console.log(boards);
+
     useFocusEffect(
         useCallback(() => {
             loadBoards();
@@ -51,8 +51,8 @@ export default function Boards() {
                 backgroundColor: "white",
                 marginTop: 20,
                 borderColor: "grey",
-                borderTopWidth: StyleSheet.hairlineWidth,
-                borderBottomWidth: StyleSheet.hairlineWidth,
+                borderTopWidth: boards.length ? StyleSheet.hairlineWidth : 0,
+                borderBottomWidth: boards.length ? StyleSheet.hairlineWidth : 0,
             }}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadBoards} />}
         />

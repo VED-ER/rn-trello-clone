@@ -8,6 +8,7 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSupabase } from "@/context/SupabaseContext";
 import { Board } from "@/types/enums";
+import BoardArea from "@/components/Board/BoardArea";
 
 export default function Id() {
     const { id, bg } = useLocalSearchParams<{ id: string; bg?: string }>();
@@ -58,8 +59,7 @@ export default function Id() {
                     <TouchableOpacity onPress={() => {}}>
                         <Ionicons name="notifications-outline" size={26} color={colors.fontLight} />
                     </TouchableOpacity>
-                    {/* TODO: fix link href*/}
-                    <Link href={`/`} asChild>
+                    <Link href={`/(authenticated)/board/settings?id=${id}`} asChild>
                         <TouchableOpacity>
                             <MaterialCommunityIcons
                                 name="dots-horizontal"
@@ -88,8 +88,7 @@ export default function Id() {
                     header: () => <CustomHeader />,
                 }}
             />
-            <Text>asdasdasd</Text>
-            {/*{board && <BoardArea board={board} />}*/}
+            {board && <BoardArea board={board} />}
         </ScrollView>
     );
 }
