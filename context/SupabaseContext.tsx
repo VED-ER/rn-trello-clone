@@ -37,7 +37,7 @@ type ProviderProps = {
     getCardInfo: (id: string) => Promise<any>;
     findUsers: (search: string) => Promise<any>;
     addUserToBoard: (boardId: string, userId: string) => Promise<any>;
-    getBoardMember: (boardId: string) => Promise<any>;
+    getBoardMembers: (boardId: string) => Promise<any>;
     getRealtimeCardSubscription: (
         id: string,
         handleRealtimeChanges: (update: RealtimePostgresChangesPayload<any>) => void,
@@ -227,7 +227,7 @@ export const SupabaseProvider = ({ children }: any) => {
         });
     };
 
-    const getBoardMember = async (boardId: string) => {
+    const getBoardMembers = async (boardId: string) => {
         const { data } = await client
             .from(USER_BOARDS_TABLE)
             .select("users(*)")
@@ -302,7 +302,7 @@ export const SupabaseProvider = ({ children }: any) => {
         getCardInfo,
         findUsers,
         addUserToBoard,
-        getBoardMember,
+        getBoardMembers,
         getRealtimeCardSubscription,
         // uploadFile,
         getFileFromPath,
