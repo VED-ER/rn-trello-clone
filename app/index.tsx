@@ -65,11 +65,11 @@ export default function Index() {
                     className={"h-[450px] w-full"}
                     contentFit={"contain"}
                 />
-                <Text className={"font-semibold text-white text-lg p-7"}>
-                    Move teamwork forward - even on the go
+                <Text className={"font-semibold text-white text-lg p-7 text-center"}>
+                    Move teamwork forward -{"\n"} even on the go
                 </Text>
 
-                <View className={"w-full px-14 gap-y-3"}>
+                <View className={"w-full px-10 gap-y-3"}>
                     <Button title={"Log in"} onPress={() => showModal(ModalType.Login)} />
                     <Button
                         title={"Sign up"}

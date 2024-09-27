@@ -21,7 +21,7 @@ export default function ListItem({ item, drag, isActive }: RenderItemParams<Card
     const openLink = () => {
         router.push(`/board/card/${item.id}`);
     };
-    console.log(item);
+
     return (
         <ScaleDecorator>
             <TouchableOpacity
