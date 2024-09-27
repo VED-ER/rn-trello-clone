@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { Board } from "@/types/enums";
 import { Link, useFocusEffect } from "expo-router";
 import { useSupabase } from "@/context/SupabaseContext";
+import { DefaultTheme } from "@react-navigation/native";
 
 export default function Boards() {
     const [boards, setBoards] = useState<Board[]>([]);
@@ -41,15 +42,28 @@ export default function Boards() {
 
     const ItemSeparatorComponent = () => <View className={"h-[0.5px] bg-grey"} />;
 
+    const ListEmptyComponent = () => (
+        <View
+            style={{ backgroundColor: DefaultTheme.colors.background }}
+            className={"flex-1 grow justify-center items-center"}
+        >
+            <Text className={"text-center text-lg font-medium"}>No Boards to display</Text>
+            <Text className={"text-center text-base text-neutral-500"}>
+                Press on a plus icon to get started
+            </Text>
+        </View>
+    );
     return (
         <FlatList
             data={boards}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             ItemSeparatorComponent={ItemSeparatorComponent}
+            ListEmptyComponent={ListEmptyComponent}
             contentContainerStyle={{
+                flexGrow: boards.length ? 0 : 1,
                 backgroundColor: "white",
-                marginTop: 20,
+                marginTop: boards.length ? 20 : 0,
                 borderColor: "grey",
                 borderTopWidth: boards.length ? StyleSheet.hairlineWidth : 0,
                 borderBottomWidth: boards.length ? StyleSheet.hairlineWidth : 0,
