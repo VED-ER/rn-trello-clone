@@ -21,7 +21,7 @@ export interface Board {
     last_edit: null;
 }
 
-export interface TaskList {
+export interface CardList {
     board_id: string;
     created_at: string;
     id: string;
@@ -29,11 +29,11 @@ export interface TaskList {
     title: string;
 }
 
-export interface TaskListFake {
+export interface CardListFake {
     id?: string;
 }
 
-export interface Task {
+export interface Card {
     id: string;
     list_id: number;
     board_id: number;

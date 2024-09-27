@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect } from "react";
 import { useAuth, useSession } from "@clerk/clerk-expo";
-import { Board, Task, TaskList } from "@/types/enums";
+import { Board, Card, CardList } from "@/types/enums";
 // import { decode } from "base64-arraybuffer";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
@@ -21,7 +21,7 @@ type ProviderProps = {
     deleteBoard: (id: string) => Promise<any>;
     getBoardLists: (boardId: string) => Promise<any>;
     addBoardList: (boardId: string, title: string, position?: number) => Promise<any>;
-    updateBoardList: (list: TaskList, newName: string) => Promise<any>;
+    updateBoardList: (list: CardList, newName: string) => Promise<any>;
     deleteBoardList: (id: string) => Promise<any>;
     getListCards: (listId: string) => Promise<any>;
     addListCard: (
@@ -31,7 +31,7 @@ type ProviderProps = {
         position?: number,
         image_url?: string | null,
     ) => Promise<any>;
-    updateCard: (task: Task) => Promise<any>;
+    updateCard: (task: Card) => Promise<any>;
     assignCard: (cardId: string, userId: string) => Promise<any>;
     deleteCard: (id: string) => Promise<any>;
     getCardInfo: (id: string) => Promise<any>;
@@ -139,7 +139,7 @@ export const SupabaseProvider = ({ children }: any) => {
             .single();
     };
 
-    const updateBoardList = async (list: TaskList, newname: string) => {
+    const updateBoardList = async (list: CardList, newname: string) => {
         return await client
             .from(LISTS_TABLE)
             .update({
@@ -180,13 +180,14 @@ export const SupabaseProvider = ({ children }: any) => {
         return lists.data || [];
     };
 
-    const updateCard = async (task: Task) => {
+    const updateCard = async (task: Card) => {
         return await client
             .from(CARDS_TABLE)
             .update({
                 title: task.title,
                 description: task.description,
                 done: task.done,
+                position: task.position,
             })
             .match({ id: task.id });
     };

@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { Board, TaskList, TaskListFake } from "@/types/enums";
+import { Board, CardList, CardListFake } from "@/types/enums";
 import Carousel, { ICarouselInstance, Pagination } from "react-native-reanimated-carousel";
 import { useSupabase } from "@/context/SupabaseContext";
 import { useEffect, useRef, useState } from "react";
@@ -19,7 +19,7 @@ export default function BoardArea({ board }: BoardAreaProps) {
     const { getBoardLists, addBoardList } = useSupabase();
     const [startListActive, setStartListActive] = useState(false);
     const scrollOffsetValue = useSharedValue<number>(0);
-    const [data, setData] = useState<(TaskList | TaskListFake)[]>([{ id: undefined }]);
+    const [data, setData] = useState<(CardList | CardListFake)[]>([{ id: undefined }]);
     const progress = useSharedValue<number>(0);
     const ref = useRef<ICarouselInstance>(null);
     const headerHeight = useHeaderHeight();
@@ -63,7 +63,7 @@ export default function BoardArea({ board }: BoardAreaProps) {
                         {item.id && (
                             <ListView
                                 key={index}
-                                taskList={item}
+                                cardList={item}
                                 onDelete={() => onListDeleted(item.id)}
                             />
                         )}
@@ -106,7 +106,7 @@ export default function BoardArea({ board }: BoardAreaProps) {
                     bottom: 0,
                     right: 0,
                     justifyContent: "center",
-                    marginBottom: 70,
+                    marginBottom: 30,
                 }}
             />
         </SafeAreaView>

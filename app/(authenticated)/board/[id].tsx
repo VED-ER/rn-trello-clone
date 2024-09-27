@@ -74,7 +74,7 @@ export default function Id() {
     );
 
     return (
-        <ScrollView
+        <View
             style={{
                 backgroundColor: bg,
                 paddingTop: headerHeight,
@@ -89,6 +89,6 @@ export default function Id() {
                 }}
             />
             {board && <BoardArea board={board} />}
-        </ScrollView>
+        </View>
     );
 }
