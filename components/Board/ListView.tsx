@@ -15,6 +15,10 @@ import ListItem from "@/components/Board/ListItem";
 import * as Haptics from "expo-haptics";
 import { DragEndParams } from "react-native-draggable-flatlist";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import * as ImagePicker from "expo-image-picker";
+import { useAuth } from "@clerk/clerk-expo";
+import * as ImageManipulator from "expo-image-manipulator";
+import DropdownImageTypeSelect from "@/components/Board/DropdownImageTypeSelect";
 
 export interface ListViewProps {
     cardList: CardList;
@@ -32,10 +36,11 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
         updateCard,
         getListCards,
         getRealtimeCardSubscription,
+        uploadFile,
     } = useSupabase();
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ["40%"], []);
-
+    const { userId } = useAuth();
     const [listName, setListName] = useState("");
 
     useEffect(() => {
@@ -137,6 +142,42 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
         });
     };
 
+    const onSelectImage = async () => {
+        // await ImagePicker.requestCameraPermissionsAsync();
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            const img = result.assets[0];
+            // const base64 = result.assets[0].base64;
+            const manipResult = await ImageManipulator.manipulateAsync(img.uri, undefined, {
+                compress: 0.5,
+                // format: SaveFormat.PNG,
+                base64: true,
+            });
+            const base64 = manipResult.base64;
+            const fileName = `${new Date().getTime()}-${userId}.${img.type === "image" ? "png" : "mp4"}`;
+            const filePath = `${cardList.board_id}/${fileName}`;
+            const contentType = img.type === "image" ? "image/png" : "video/mp4";
+            const storagePath = await uploadFile!(filePath, base64!, contentType);
+
+            if (storagePath) {
+                await addListCard!(
+                    cardList.id,
+                    cardList.board_id,
+                    fileName,
+                    cards.length,
+                    storagePath,
+                );
+            }
+        }
+    };
+
     const renderBackdrop = useCallback(
         (props: any) => (
             <BottomSheetBackdrop
@@ -176,7 +217,7 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
                         activationDistance={10}
                         containerStyle={{
                             paddingBottom: 4,
-                            maxHeight: "80%",
+                            maxHeight: "85%",
                         }}
                         contentContainerStyle={{ gap: 4 }}
                     />
@@ -208,9 +249,10 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
                                     <Ionicons name="add" size={14} />
                                     <Text className={"text-xs"}>Add card</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => {}}>
-                                    <Ionicons name="image-outline" size={18} />
-                                </TouchableOpacity>
+                                <DropdownImageTypeSelect />
+                                {/*<TouchableOpacity onPress={onSelectImage}>*/}
+                                {/*    <Ionicons name="image-outline" size={18} />*/}
+                                {/*</TouchableOpacity>*/}
                             </>
                         )}
                         {isAdding && (

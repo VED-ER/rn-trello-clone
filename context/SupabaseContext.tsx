@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth, useSession } from "@clerk/clerk-expo";
 import { Board, Card, CardList } from "@/types/enums";
-// import { decode } from "base64-arraybuffer";
+import { decode } from "base64-arraybuffer";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { createClerkSupabaseClient } from "@/utils/supabaseClient";
 
@@ -253,13 +253,13 @@ export const SupabaseProvider = ({ children }: any) => {
             .subscribe();
     };
 
-    // const uploadFile = async (filePath: string, base64: string, contentType: string) => {
-    //     const { data } = await client.storage
-    //         .from(FILES_BUCKET)
-    //         .upload(filePath, decode(base64), { contentType });
-    //
-    //     return data?.path;
-    // };
+    const uploadFile = async (filePath: string, base64: string, contentType: string) => {
+        const { data } = await client.storage
+            .from(FILES_BUCKET)
+            .upload(filePath, decode(base64), { contentType });
+
+        return data?.path;
+    };
 
     const getFileFromPath = async (path: string) => {
         const { data } = await client.storage.from(FILES_BUCKET).createSignedUrl(path, 60 * 60, {
@@ -304,7 +304,7 @@ export const SupabaseProvider = ({ children }: any) => {
         addUserToBoard,
         getBoardMembers,
         getRealtimeCardSubscription,
-        // uploadFile,
+        uploadFile,
         getFileFromPath,
         setUserPushToken,
     };
