@@ -14,6 +14,7 @@ import DraggableFlatList from "react-native-draggable-flatlist/src/components/Dr
 import ListItem from "@/components/Board/ListItem";
 import * as Haptics from "expo-haptics";
 import { DragEndParams } from "react-native-draggable-flatlist";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 export interface ListViewProps {
     cardList: CardList;
@@ -24,8 +25,14 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
     const [isAdding, setIsAdding] = useState(false);
     const [newCardTitle, setNewCardTitle] = useState("");
     const [cards, setCards] = useState<Card[]>([]);
-    const { deleteBoardList, updateBoardList, addListCard, updateCard, getListCards } =
-        useSupabase();
+    const {
+        deleteBoardList,
+        updateBoardList,
+        addListCard,
+        updateCard,
+        getListCards,
+        getRealtimeCardSubscription,
+    } = useSupabase();
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ["40%"], []);
 
@@ -37,7 +44,48 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
 
     useEffect(() => {
         loadListCards();
-    }, []);
+
+        const subscription = getRealtimeCardSubscription!(cardList.id, handleRealtimeChanges);
+        // console.log("subscription", subscription);
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [cardList.id]);
+
+    const handleRealtimeChanges = (update: RealtimePostgresChangesPayload<any>) => {
+        console.log("REALTIME UPDATE:", update);
+        const event = update.eventType;
+
+        if (event === "INSERT") {
+            setCards((prev) => {
+                return [...prev, update.new];
+            });
+        } else if (event === "UPDATE") {
+            setCards((prev) => {
+                const newCards = prev.map((task) => {
+                    if (task.id === update.old.id) {
+                        return update.new;
+                    }
+                    return task;
+                });
+                // if property of a card is updated e.g done(boolean), it is not fetched if its false, then if updated to true
+                // it won't be available in current state of cards, therefore it needs to be added
+                const updatedCardExistsInCurrentState = prev.find(
+                    (card) => card.id === update.new.id,
+                );
+                if (!updatedCardExistsInCurrentState) newCards.push(update.new);
+                return newCards
+                    .filter((task) => !task.done)
+                    .sort((a, b) => a.position - b.position);
+            });
+        } else if (event === "DELETE") {
+            setCards((prev) => {
+                return prev.filter((task) => task.id !== update.old.id);
+            });
+        } else {
+            console.log("Unhandled event", event);
+        }
+    };
 
     const loadListCards = async () => {
         const data = await getListCards!(cardList.id);
@@ -75,7 +123,7 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
             setNewCardTitle("");
         }
         // Unnecessary when using realtime updates
-        setCards((prevCards) => [...prevCards, data]);
+        // setCards((prevCards) => [...prevCards, data]);
     };
 
     const onTaskDropped = async (params: DragEndParams<Card>) => {

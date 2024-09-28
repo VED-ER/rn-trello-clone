@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth, useSession } from "@clerk/clerk-expo";
 import { Board, Card, CardList } from "@/types/enums";
 // import { decode } from "base64-arraybuffer";
@@ -60,11 +60,11 @@ export function useSupabase() {
 export const SupabaseProvider = ({ children }: any) => {
     const { userId } = useAuth();
     const { session } = useSession();
-    const client = createClerkSupabaseClient(session);
+    const [client, setClient] = useState(createClerkSupabaseClient(session));
 
     useEffect(() => {
-        setRealtimeAuth();
-    }, []);
+        if (client) setRealtimeAuth();
+    }, [client]);
 
     const setRealtimeAuth = async () => {
         const clerkToken = await session?.getToken({
