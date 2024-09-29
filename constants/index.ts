@@ -6,6 +6,8 @@ import slack from "@/assets/images/login/slack.png";
 import logoIconBlue from "@/assets/images/logo-icon-blue.png";
 import logoIconNeutral from "@/assets/images/logo-icon-neutral.png";
 import trelloLogoGradientWhite from "@/assets/images/trello-logo-gradient-white.png";
+import photoCamera32px from "@/assets/images/photo-camera-32px.png";
+import imageIcon32px from "@/assets/images/image-icon-32px.png";
 
 export const images = {
     loginTrello,
@@ -16,6 +18,8 @@ export const images = {
     logoIconBlue,
     logoIconNeutral,
     trelloLogoGradientWhite,
+    photoCamera32px,
+    imageIcon32px,
 };
 
 export const BOARD_COLORS = [

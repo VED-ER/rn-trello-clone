@@ -1,5 +1,14 @@
 import { Card, CardList } from "@/types/enums";
-import { Alert, Button, Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+    Alert,
+    Button,
+    KeyboardAvoidingView,
+    Platform,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "@/constants/tailwind-colors";
 import {
@@ -19,6 +28,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useAuth } from "@clerk/clerk-expo";
 import * as ImageManipulator from "expo-image-manipulator";
 import DropdownImageTypeSelect from "@/components/Board/DropdownImageTypeSelect";
+import { ImagePickerAsset, useCameraPermissions } from "expo-image-picker";
 
 export interface ListViewProps {
     cardList: CardList;
@@ -42,6 +52,7 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
     const snapPoints = useMemo(() => ["40%"], []);
     const { userId } = useAuth();
     const [listName, setListName] = useState("");
+    const [permission, requestPermission] = useCameraPermissions();
 
     useEffect(() => {
         setListName(cardList.title);
@@ -142,6 +153,52 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
         });
     };
 
+    const prepareImageAndUpload = async (img: ImagePickerAsset) => {
+        // const base64 = result.assets[0].base64;
+        const manipResult = await ImageManipulator.manipulateAsync(img.uri, undefined, {
+            compress: 0.5,
+            // format: SaveFormat.PNG,
+            base64: true,
+        });
+        const base64 = manipResult.base64;
+        const fileName = `${new Date().getTime()}-${userId}.${img.type === "image" ? "png" : "mp4"}`;
+        const filePath = `${cardList.board_id}/${fileName}`;
+        const contentType = img.type === "image" ? "image/png" : "video/mp4";
+        const storagePath = await uploadFile!(filePath, base64!, contentType);
+
+        if (storagePath) {
+            await addListCard!(cardList.id, cardList.board_id, fileName, cards.length, storagePath);
+        }
+    };
+
+    const onCameraPress = async () => {
+        if (permission?.status === "denied") {
+            if (permission.canAskAgain) {
+                await requestPermission();
+            } else {
+                Alert.alert("Missing permission", "Please allow camera access in your settings");
+                return;
+            }
+        }
+
+        if (!permission?.granted) {
+            const res = await requestPermission();
+            if (!res.granted) return;
+        }
+
+        let result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+            base64: true,
+        });
+
+        if (!result.canceled) {
+            await prepareImageAndUpload(result.assets[0]);
+        }
+    };
+
     const onSelectImage = async () => {
         // await ImagePicker.requestCameraPermissionsAsync();
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -153,28 +210,7 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
         });
 
         if (!result.canceled) {
-            const img = result.assets[0];
-            // const base64 = result.assets[0].base64;
-            const manipResult = await ImageManipulator.manipulateAsync(img.uri, undefined, {
-                compress: 0.5,
-                // format: SaveFormat.PNG,
-                base64: true,
-            });
-            const base64 = manipResult.base64;
-            const fileName = `${new Date().getTime()}-${userId}.${img.type === "image" ? "png" : "mp4"}`;
-            const filePath = `${cardList.board_id}/${fileName}`;
-            const contentType = img.type === "image" ? "image/png" : "video/mp4";
-            const storagePath = await uploadFile!(filePath, base64!, contentType);
-
-            if (storagePath) {
-                await addListCard!(
-                    cardList.id,
-                    cardList.board_id,
-                    fileName,
-                    cards.length,
-                    storagePath,
-                );
-            }
+            await prepareImageAndUpload(result.assets[0]);
         }
     };
 
@@ -223,13 +259,15 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
                     />
 
                     {isAdding && (
-                        <TextInput
-                            autoFocus
-                            style={{ elevation: 1 }}
-                            className={`p-2 mb-3 bg-white ${Platform.OS !== "android" ? "shadow-sm" : ""} rounded`}
-                            value={newCardTitle}
-                            onChangeText={setNewCardTitle}
-                        />
+                        <KeyboardAvoidingView behavior={"padding"}>
+                            <TextInput
+                                autoFocus
+                                style={{ elevation: 1 }}
+                                className={`p-2 mb-3 bg-white ${Platform.OS !== "android" ? "shadow-sm" : ""} rounded`}
+                                value={newCardTitle}
+                                onChangeText={setNewCardTitle}
+                            />
+                        </KeyboardAvoidingView>
                     )}
 
                     <View
@@ -249,7 +287,10 @@ export default function ListView({ cardList, onDelete }: ListViewProps) {
                                     <Ionicons name="add" size={14} />
                                     <Text className={"text-xs"}>Add card</Text>
                                 </TouchableOpacity>
-                                <DropdownImageTypeSelect />
+                                <DropdownImageTypeSelect
+                                    onImagePress={onSelectImage}
+                                    onCameraPress={onCameraPress}
+                                />
                                 {/*<TouchableOpacity onPress={onSelectImage}>*/}
                                 {/*    <Ionicons name="image-outline" size={18} />*/}
                                 {/*</TouchableOpacity>*/}
