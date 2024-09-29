@@ -2,6 +2,7 @@ import { router, Stack } from "expo-router";
 import { Platform, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/tailwind-colors";
+import { DefaultTheme } from "@react-navigation/native";
 
 export default function Layout() {
     return (
@@ -35,6 +36,17 @@ export default function Layout() {
                             <Ionicons name={"close"} size={24} color={colors.grey} />
                         </TouchableOpacity>
                     ),
+                }}
+            />
+            <Stack.Screen
+                name="board/card/[id]"
+                options={{
+                    presentation: "containedModal",
+                    title: "",
+                    headerShadowVisible: false,
+                    headerStyle: {
+                        backgroundColor: DefaultTheme.colors.background,
+                    },
                 }}
             />
         </Stack>
