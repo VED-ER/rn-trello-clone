@@ -228,6 +228,7 @@ language plpgsql
 security definer
 as $$
 begin
+-- BUG - <> won't work because initial assigned_to value is NULL, to account for that use IS DISTINCT FROM instead
   if new.assigned_to <> old.assigned_to then
     insert into notifications (user_id, body, card_id)
     values (new.assigned_to, 'You have been assigned to a card!', new.id);
